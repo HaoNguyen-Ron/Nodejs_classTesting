@@ -1,32 +1,30 @@
 var express = require('express');
 var router = express.Router();
-const fs = require('fs');
-
 
 const {
   getAll,
-  getId,
   getDetail,
+  search,
   create,
   hardDelete,
   update
 } = require('./controller')
 
 const {updateProductSchema} = require('./validation')
-
-const data = require('../../data/categories.json');
-const { writeFileSync, generationID,validateSchema, checkIdSchema } = require('../../utils');
+const { validateSchema, checkIdSchema } = require('../../utils');
 
 router.route('/')
   .get(getAll)
-  .post(create);
+  .post(validateSchema(updateProductSchema),create);
+
+  
+router.route('/search')
+.get(search)
+
 
 router.route('/:id')
-  .get(getId, validateSchema(checkIdSchema))
-  .patch( update,validateSchema(checkIdSchema),validateSchema(updateProductSchema))
-  .delete(hardDelete, validateSchema(checkIdSchema));
-
-router.get('/search')
-  .get(getDetail)
+  .get( validateSchema(checkIdSchema), getDetail)
+  .put( validateSchema(checkIdSchema),validateSchema(updateProductSchema), update)
+  .delete(validateSchema(checkIdSchema), hardDelete);
 
 module.exports = router;

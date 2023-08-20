@@ -1,6 +1,6 @@
 const fs = require('fs');
 const yup = require('yup');
-
+const ObjectId = require('mongodb').ObjectId;
 module.exports = {
   writeFileSync: (path, data) => {
     fs.writeFileSync(path, JSON.stringify(data), function (err) {
@@ -33,11 +33,19 @@ module.exports = {
     }
   },
 
+  // checkIdSchema: yup.object({
+  //   params: yup.object({
+  //     id: yup.number(),
+  //   })
+  // }),
   checkIdSchema: yup.object({
     params: yup.object({
-      id: yup.number(),
-    })
+      id: yup.string().test('inValid', 'ID sai định dạng', (value) => {
+        return ObjectId.isValid(value);
+      }),
+    }),
   }),
+
 
   fuzzySearch: (text) => {
     const regex = text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');

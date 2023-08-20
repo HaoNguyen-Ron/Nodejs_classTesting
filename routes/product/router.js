@@ -141,12 +141,12 @@ const { writeFileSync, generationID, validateSchema,checkIdSchema } = require('.
 /// FULL V-3: tách biệt và gộp các router
 router.route('/')
   .get(getAll)
-  .post(create);
+  .post(validateSchema(updateProductSchema), create);
 
 router.route('/:id')
-  .get(getId, validateSchema(checkIdSchema))
-  .patch( update,validateSchema(checkIdSchema),validateSchema(updateProductSchema))
-  .delete(hardDelete, validateSchema(checkIdSchema));
+  .get(validateSchema(checkIdSchema), getId)
+  .patch(validateSchema(checkIdSchema),validateSchema(updateProductSchema), update)
+  .delete(validateSchema(checkIdSchema), hardDelete);
 
 router.get('/search')
   .get(getDetail)
