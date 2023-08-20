@@ -1,53 +1,106 @@
-const yup = require('yup');
-const fs = require('fs');
-let data = require('../../data/suppliers.json');
-const { writeFileSync, generationID, validateSchema, checkIdSchema } = require('../../utils');
+const { default: mongoose } = require('mongoose');
 
-const getAll = (req, res, next) => {
-    res.send(data)
+const { fuzzySearch } = require('../../utils');
+
+const Supplier = require('../../models/supplier');
+
+// mongoose.connect('mongodb://localhost:27017/node-32-database');
+mongoose.connect('mongodb://127.0.0.1:27017/node-32-database');
+
+
+const getAll = async (req, res, next) => {
+    try {
+        const payload = await Supplier.find({
+            isDeleted: false
+        });
+        res.send(200, {
+            payload: payload,
+            message: "Tạo thành công"
+        });
+    } catch (error) {
+        res.send(400, {
+            payload: payload,
+            message: "Tạo thất bại"
+        });
+    }
 };
 
-const getId = function (req, res, next) {
-    const { id } = req.params;
+//get detail
+const getDetail = async function (req, res, next) {
+    try {
+        const { id } = req.params;
 
-    const validationSchema = yup.number();
+        const payload = await Supplier.findOne({
+            _id: id,
+            isDeleted: false,
+        });
 
-    validationSchema
-        .validate(id)
-        .then(() => {
-            let result = data.find((x) => x.id == id);
-
-            if (result) {
-                return res.send({ code: 200, payload: result });
-            }
-            return res.send(404, { message: "Not found" });
-        })
-        .catch((err) => res.send(400, { message: "Bad request" })
-        );
+        res.send(200, {
+            payload: payload,
+            message: "Tạo thành công"
+        });
+    } catch (error) {
+        res.send(400, {
+            payload: payload,
+            message: "Tạo thất bại"
+        });
+    }
 };
 
-const getDetail = function (req, res, next) {
-    const { price } = req.query;
-    const filter = data.filter((item) => item.price >= price)
-    res.send(filter);
+//search
+const search = async function (req, res, next) {
+    try {
+        const { name } = req.query;
+
+        const conditionFind =  {isDeleted: false};
+
+        if(name){
+            conditionFind.name = fuzzySearch(name)
+        };
+
+        const payload = await Supplier.find(conditionFind);
+
+        res.send(200, {
+            payload: payload,
+            message: "Tim kiếm tên thành công"
+        });
+    } catch (error) {
+        res.send(400, {
+            payload: payload,
+            message: "Tim kiếm tên thất bại"
+        });
+    }
 };
+
+/** CREATE */
 
 const create = async function (req, res, next) {
-    const { name, isDelete, email, phoneNumber, address } = req.body;
+    const { name, email, phoneNumber, isDeleted, address } = req.body;
 
-    const newP = { name, isDelete, email, phoneNumber, address, id: generationID() };
-    if (data?.length > 0) {
-        await writeFileSync('data/suppliers.json', [...data, newP]);
-    } else {
-        await writeFileSync('data/suppliers.json', [newP]);
+    try {
+        const newSupplier = new Supplier({
+            name,
+            email,
+            phoneNumber,
+            address,
+            isDeleted
+        });
+
+        const payload = await newSupplier.save();
+
+        res.send(200, {
+            payload: payload,
+            message: "Tạo thành công"
+        });
+    } catch (err) {
+        res.send(400, {
+            payload: payload,
+            message: "Tạo thất bại"
+        });
     }
-
-    res.send(200, {
-        payload: newP,
-        message: "Tạo thành công"
-    });
 };
 
+/** UPDATE */
 const update = function (req, res, next) {
     try {
         const { id } = req.params;
@@ -68,19 +121,39 @@ const update = function (req, res, next) {
     }
 };
 
+
+/** DELETE */
 const hardDelete = async function (req, res, next) {
-    const { id } = req.params;
 
-    data = data.filter((x) => x.id.toString() !== id.toString());
+    try {
+        const { id } = req.params;
+        const payload = await Supplier.findOneAndUpdate(
+            {
+                _id: id,
+                isDeleted: false
+            },
+            { isDeleted: true },
+            { new: true }
+        );
+        if (payload) {
 
-    await writeFileSync('data/suppliers.json', data);
-
-    res.send({ ok: true, message: 'Deleted' });
+            res.send(200, {
+                payload: payload,
+                message: "Xóa thành công"
+            });
+        }
+        return res.send(200, 'Không tìm thấy tên nhà cung cấp')
+    } catch (err) {
+        res.send(400, {
+            payload: payload,
+            message: "Xóa thất bại"
+        });
+    }
 };
 
 module.exports = {
     getAll,
-    getId,
+    search,
     getDetail,
     create,
     hardDelete,

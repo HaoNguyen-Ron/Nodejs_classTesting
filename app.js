@@ -3,12 +3,14 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const { default: mongoose } = require('mongoose');
+
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var productRouter = require('./routes/product/router');
 var categoryRouter = require('./routes/category/router');
-var suppliersRouter = require('./routes/suppliers');
+var suppliersRouter = require('./routes/supplier/router');
 
 var app = express();
 
@@ -21,6 +23,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// // mongoose.connect('mongodb://localhost:27017/node-32-database');
+// mongoose.connect('mongodb://127.0.0.1:27017/node-32-database');
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);

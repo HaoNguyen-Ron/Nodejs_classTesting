@@ -1,29 +1,28 @@
 var express = require('express');
 var router = express.Router();
-const fs = require('fs');
-
 
 const {
   getAll,
-  getId,
   getDetail,
   create,
   hardDelete,
   update
 } = require('./controller')
 
-const {updateProductSchema} = require('./validation')
+
+const { validateSchema, checkIdSchema } = require('../../utils');
+const { supplierSchema } = require('./validation');
 
 router.route('/')
   .get(getAll)
-  .post(create);
-
-router.route('/:id')
-  .get(validateSchema(checkIdSchema), getId)
-  .patch( validateSchema(checkIdSchema),validateSchema(updateProductSchema), update)
-  .delete( validateSchema(checkIdSchema),hardDelete);
+  .post(validateSchema(supplierSchema),create);
 
 router.get('/search')
   .get(getDetail)
+
+router.route('/:id')
+  .get(validateSchema(checkIdSchema), getDetail)
+  .put(validateSchema(checkIdSchema), validateSchema(supplierSchema), update)
+  .delete(validateSchema(checkIdSchema), hardDelete);
 
 module.exports = router;
