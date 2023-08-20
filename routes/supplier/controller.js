@@ -19,7 +19,7 @@ const getAll = async (req, res, next) => {
         });
     } catch (error) {
         res.send(400, {
-            payload: payload,
+            error,
             message: "Tạo thất bại"
         });
     }
@@ -41,7 +41,7 @@ const getDetail = async function (req, res, next) {
         });
     } catch (error) {
         res.send(400, {
-            payload: payload,
+            error,
             message: "Tạo thất bại"
         });
     }
@@ -66,7 +66,7 @@ const search = async function (req, res, next) {
         });
     } catch (error) {
         res.send(400, {
-            payload: payload,
+            error,
             message: "Tim kiếm tên thất bại"
         });
     }
@@ -88,13 +88,14 @@ const create = async function (req, res, next) {
 
         const payload = await newSupplier.save();
 
+
         res.send(200, {
             payload: payload,
             message: "Tạo thành công"
         });
     } catch (err) {
         res.send(400, {
-            payload: payload,
+            err,
             message: "Tạo thất bại"
         });
     }
@@ -145,7 +146,7 @@ const hardDelete = async function (req, res, next) {
         return res.send(200, 'Không tìm thấy tên nhà cung cấp')
     } catch (err) {
         res.send(400, {
-            payload: payload,
+            err,
             message: "Xóa thất bại"
         });
     }

@@ -19,7 +19,7 @@ const getAll = async (req, res, next) => {
         });
     } catch (error) {
         res.send(400, {
-            payload: payload,
+            error,
             message: "Tạo thất bại"
         });
     }
@@ -42,7 +42,7 @@ const getDetail = async function (req, res, next) {
         });
     } catch (error) {
         res.send(400, {
-            payload: payload,
+            error,
             message: "Tạo thất bại"
         });
     }
@@ -67,7 +67,7 @@ const search = async function (req, res, next) {
         });
     } catch (error) {
         res.send(400, {
-            payload: payload,
+            error,
             message: "Tim kiếm tên thất bại"
         });
     }
@@ -85,6 +85,7 @@ const create = async function (req, res, next) {
         });
 
         const payload = await newCategory.save();
+        console.log('««««« payload »»»»»', payload);
 
         res.send(200, {
             payload: payload,
@@ -92,7 +93,7 @@ const create = async function (req, res, next) {
         });
     } catch (err) {
         res.send(400, {
-            payload: payload,
+            err,
             message: "Tạo thất bại"
         });
     }
@@ -143,7 +144,7 @@ const hardDelete = async function (req, res, next) {
         return res.send(200, 'Không tìm thấy danh mục')
     } catch (err) {
         res.send(400, {
-            payload: payload,
+            err,
             message: "Xóa thất bại"
         });
     }

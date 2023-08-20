@@ -16,7 +16,7 @@ const supplierSchema = new Schema(
         validator: function (value) {
           const emailRegex =
             /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
-          return emailRegex.text(value);
+          return emailRegex.test(value);
         },
         message: `{value} không phải là email hợp lệ`,
       },
@@ -29,7 +29,7 @@ const supplierSchema = new Schema(
       validate: {
         validator: function (value) {
           const phoneRegex = /(84|0[3|5|7|8|9])+([0-9]{8})\b/g;
-          return phoneRegex.text(value);
+          return phoneRegex.test(value);
         },
         message: `{value} không phải là số điện thoại hợp lệ`,
       },
