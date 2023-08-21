@@ -2,48 +2,47 @@ const { default: mongoose } = require('mongoose');
 
 const { fuzzySearch } = require('../../utils');
 
-const Category = require('../../models/category');
-
+const {Customer} = require('../../models');
 
 // mongoose.connect('mongodb://localhost:27017/node-32-database');
 mongoose.connect('mongodb://127.0.0.1:27017/node-32-database');
 
+
 const getAll = async (req, res, next) => {
     try {
-        const payload = await Category.find({
+        const payload = await Customer.find({
             isDeleted: false
         });
         res.send(200, {
             payload: payload,
-            message: "Tạo thành công"
+            message: "Tìm kiếm tất cả thành công"
         });
     } catch (error) {
         res.send(400, {
             error,
-            message: "Tạo thất bại"
+            message: "Tìm kiếm tất cả thất bại"
         });
     }
 };
 
 //get detail
 const getDetail = async function (req, res, next) {
-
     try {
         const { id } = req.params;
 
-        const payload = await Category.findOne({
+        const payload = await Customer.findOne({
             _id: id,
             isDeleted: false,
         });
 
         res.send(200, {
             payload: payload,
-            message: "Tạo thành công"
+            message: "Tìm kiếm thành công"
         });
     } catch (error) {
         res.send(400, {
             error,
-            message: "Tạo thất bại"
+            message: "Tìm kiếm không thành công hoặc sai mã Id"
         });
     }
 };
@@ -57,9 +56,9 @@ const search = async function (req, res, next) {
 
         if(name){
             conditionFind.name = fuzzySearch(name)
-        }
+        };
 
-        const payload = await Category.find(conditionFind);
+        const payload = await Customer.find(conditionFind);
 
         res.send(200, {
             payload: payload,
@@ -76,15 +75,22 @@ const search = async function (req, res, next) {
 /** CREATE */
 
 const create = async function (req, res, next) {
-    const { name, isDeleted, description } = req.body;
+    const { firstName, lastName , birthday, email, phoneNumber, isDeleted, address, password } = req.body;
 
     try {
-        const newCategory = new Category({
-            name,
-            description,
+        const newCustomer = new Customer({
+            firstName, 
+            lastName , 
+            birthday, 
+            email, 
+            phoneNumber, 
+            isDeleted, 
+            address, 
+            password 
         });
 
-        const payload = await newCategory.save();
+        const payload = await newCustomer.save();
+
 
         res.send(200, {
             payload: payload,
@@ -100,10 +106,11 @@ const create = async function (req, res, next) {
 
 /** UPDATE */
 const update = async function (req, res, next) {
+    console.log('««««« saadas »»»»»');
     try {
       const { id } = req.params;
   
-      const payload = await Category.findOneAndUpdate(
+      const payload = await Customer.findOneAndUpdate(
         { _id: id, isDeleted: false },
         { ...req.body },
         { new: true },
@@ -131,7 +138,7 @@ const hardDelete = async function (req, res, next) {
 
     try {
         const { id } = req.params;
-        const payload = await Category.findOneAndUpdate(
+        const payload = await Customer.findOneAndUpdate(
             {
                 _id: id,
                 isDeleted: false
@@ -140,13 +147,12 @@ const hardDelete = async function (req, res, next) {
             { new: true }
         );
         if (payload) {
-
             res.send(200, {
                 payload: payload,
                 message: "Xóa thành công"
             });
         }
-        return res.send(200, 'Không tìm thấy danh mục')
+        return res.send(200, 'Không tìm thấy tên nhà cung cấp')
     } catch (err) {
         res.send(400, {
             err,
@@ -157,8 +163,8 @@ const hardDelete = async function (req, res, next) {
 
 module.exports = {
     getAll,
-    getDetail,
     search,
+    getDetail,
     create,
     hardDelete,
     update

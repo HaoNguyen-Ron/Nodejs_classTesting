@@ -1,6 +1,7 @@
 const fs = require('fs');
 const yup = require('yup');
 const ObjectId = require('mongodb').ObjectId;
+
 module.exports = {
   writeFileSync: (path, data) => {
     fs.writeFileSync(path, JSON.stringify(data), function (err) {

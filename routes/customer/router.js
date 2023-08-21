@@ -11,18 +11,18 @@ const {
 
 
 const { validateSchema, checkIdSchema } = require('../../utils');
-const { employeeSchema } = require('./validation');
+const { customerSchema } = require('./validation');
 
 router.route('/')
   .get(getAll)
-  .post(validateSchema(employeeSchema), create);
+  .post(validateSchema(customerSchema), create);
 
 router.get('/search')
   .get(getDetail)
 
 router.route('/:id')
   .get(validateSchema(checkIdSchema), getDetail)
-  .put(validateSchema(checkIdSchema), validateSchema(employeeSchema), update)
+  .put(validateSchema(checkIdSchema), validateSchema(customerSchema), update)
   .delete(validateSchema(checkIdSchema), hardDelete);
 
 module.exports = router;

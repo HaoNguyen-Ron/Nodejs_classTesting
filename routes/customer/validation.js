@@ -2,7 +2,7 @@ var express = require('express');
 
 const yup = require('yup');
 
-const employeeSchema = yup.object({
+const customerSchema = yup.object({
     body: yup.object({
         firstName: yup.string().max(50).required(),
         lastName: yup.string().max(50).required(),
@@ -25,5 +25,5 @@ const employeeSchema = yup.object({
     }),
 });
 module.exports = {
-    employeeSchema,
+    customerSchema,
 };

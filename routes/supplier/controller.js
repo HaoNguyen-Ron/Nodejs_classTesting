@@ -102,25 +102,31 @@ const create = async function (req, res, next) {
 };
 
 /** UPDATE */
-const update = function (req, res, next) {
+const update = async function (req, res, next) {
     try {
-        const { id } = req.params;
-
-        const patchData = req.body;
-
-        let found = data.find((x) => x.id == id);
-
-        if (found) {
-            for (let propertyName in patchData) {
-                found[propertyName] = patchData[propertyName];
-            }
-            res.send({ ok: true, message: 'Updated' });
-        }
-        res.send({ ok: false, message: 'Updated fail' });
+      const { id } = req.params;
+  
+      const payload = await Supplier.findOneAndUpdate(
+        { _id: id, isDeleted: false },
+        { ...req.body },
+        { new: true },
+      );
+  
+      if (payload) {
+        return res.send(200, {
+          payload,
+          message: "Cập nhập thành công"
+        });
+      }
+      return res.send(404, { message: "Không tìm thấy" });
     } catch (error) {
-        res.send({ ok: false, message: 'Updated fail' });
+      console.log('««««« error »»»»»', error);
+      res.send(400, {
+        error,
+        message: "Cập nhập không thành công"
+      });
     }
-};
+  };
 
 
 /** DELETE */

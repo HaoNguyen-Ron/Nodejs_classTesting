@@ -3,7 +3,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-const { default: mongoose } = require('mongoose');
+// const { default: mongoose } = require('mongoose');
 
 
 var indexRouter = require('./routes/index');
@@ -12,6 +12,7 @@ var productRouter = require('./routes/product/router');
 var categoryRouter = require('./routes/category/router');
 var suppliersRouter = require('./routes/supplier/router');
 var employeesRouter = require('./routes/employee/router');
+var customerRouter = require('./routes/customer/router');
 
 var app = express();
 
@@ -34,6 +35,7 @@ app.use('/products', productRouter);
 app.use('/categories', categoryRouter);
 app.use('/suppliers', suppliersRouter);
 app.use('/employees', employeesRouter);
+app.use('/customers', customerRouter);
 
 
 // catch 404 and forward to error handler

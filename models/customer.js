@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
 
-const employeeSchema = new Schema(
+const customerSchema = new Schema(
   {
     firstName: {
       type: String,
@@ -77,5 +77,5 @@ const employeeSchema = new Schema(
 
 );
 
-const Employee = model("employees", employeeSchema);
-module.exports = Employee;
+const Customer = model("customers", customerSchema);
+module.exports = Customer;

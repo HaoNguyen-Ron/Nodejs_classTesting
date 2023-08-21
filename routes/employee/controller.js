@@ -2,7 +2,7 @@ const { default: mongoose } = require('mongoose');
 
 const { fuzzySearch } = require('../../utils');
 
-const Employee = require('../../models');
+const {Employee} = require('../../models');
 
 // mongoose.connect('mongodb://localhost:27017/node-32-database');
 mongoose.connect('mongodb://127.0.0.1:27017/node-32-database');
@@ -37,12 +37,12 @@ const getDetail = async function (req, res, next) {
 
         res.send(200, {
             payload: payload,
-            message: "Tạo thành công"
+            message: "Tìm kiếm thành công"
         });
     } catch (error) {
         res.send(400, {
             error,
-            message: "Tạo thất bại"
+            message: "Tìm kiếm không thành công hoặc sai mã Id"
         });
     }
 };
@@ -79,7 +79,14 @@ const create = async function (req, res, next) {
 
     try {
         const newEmployee = new Employee({
-            firstName, lastName , birthday, email, phoneNumber, isDeleted, address, password 
+            firstName, 
+            lastName , 
+            birthday, 
+            email, 
+            phoneNumber, 
+            isDeleted, 
+            address, 
+            password 
         });
 
         const payload = await newEmployee.save();
@@ -98,25 +105,32 @@ const create = async function (req, res, next) {
 };
 
 /** UPDATE */
-const update = function (req, res, next) {
+const update = async function (req, res, next) {
+    console.log('««««« saadas »»»»»');
     try {
-        const { id } = req.params;
-
-        const patchData = req.body;
-
-        let found = data.find((x) => x.id == id);
-
-        if (found) {
-            for (let propertyName in patchData) {
-                found[propertyName] = patchData[propertyName];
-            }
-            res.send({ ok: true, message: 'Updated' });
-        }
-        res.send({ ok: false, message: 'Updated fail' });
+      const { id } = req.params;
+  
+      const payload = await Employee.findOneAndUpdate(
+        { _id: id, isDeleted: false },
+        { ...req.body },
+        { new: true },
+      );
+  
+      if (payload) {
+        return res.send(200, {
+          payload,
+          message: "Cập nhập thành công"
+        });
+      }
+      return res.send(404, { message: "Không tìm thấy" });
     } catch (error) {
-        res.send({ ok: false, message: 'Updated fail' });
+      console.log('««««« error »»»»»', error);
+      res.send(400, {
+        error,
+        message: "Cập nhập không thành công"
+      });
     }
-};
+  };
 
 
 /** DELETE */
@@ -133,7 +147,6 @@ const hardDelete = async function (req, res, next) {
             { new: true }
         );
         if (payload) {
-
             res.send(200, {
                 payload: payload,
                 message: "Xóa thành công"
