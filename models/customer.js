@@ -7,13 +7,13 @@ const customerSchema = new Schema(
     firstName: {
       type: String,
       required: [true, "Tên nhân viên không được bỏ trống"],
-      maxLength: [20, "Tên nhân viên không vượt quá 20 kí tự"],
+      maxLength: [20, "Tên nhân viên không vượt quá 20 kí tự"]
     },
 
     lastName: {
       type: String,
       required: [true, "Tên nhân viên không được bỏ trống"],
-      maxLength: [20, "Tên nhân viên không vượt quá 20 kí tự"],
+      maxLength: [20, "Tên nhân viên không vượt quá 20 kí tự"]
     },
 
     email: {

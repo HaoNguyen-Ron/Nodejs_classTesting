@@ -18,7 +18,7 @@ const supplierSchema = new Schema(
             /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
           return emailRegex.test(value);
         },
-        message: `{value} không phải là email hợp lệ`,
+        message: `{VALUE} không phải là email hợp lệ`,
       },
       required: [true, "Email không được bỏ trống"],
       unique: true,
@@ -31,7 +31,7 @@ const supplierSchema = new Schema(
           const phoneRegex = /(84|0[3|5|7|8|9])+([0-9]{8})\b/g;
           return phoneRegex.test(value);
         },
-        message: `{value} không phải là số điện thoại hợp lệ`,
+        message: `{VALUE} không phải là số điện thoại hợp lệ`,
       },
       unique: true,
     },
