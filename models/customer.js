@@ -7,14 +7,12 @@ const customerSchema = new Schema(
       type: String,
       required: [true, "Tên nhân viên không được bỏ trống"],
       maxLength: [20, "Tên nhân viên không vượt quá 20 kí tự"],
-      unique: [true, "Tên nhân viên không được trùng nhau"],
     },
 
     lastName: {
       type: String,
       required: [true, "Tên nhân viên không được bỏ trống"],
       maxLength: [20, "Tên nhân viên không vượt quá 20 kí tự"],
-      unique: [true, "Tên nhân viên không được trùng nhau"],
     },
 
     email: {
