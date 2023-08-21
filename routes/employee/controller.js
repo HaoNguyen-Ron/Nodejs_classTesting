@@ -49,34 +49,35 @@ const getDetail = async function (req, res, next) {
 
 //search
 const search = async function (req, res, next) {
-    try {
-        const { name } = req.query;
+   try {
+    const { firstName, lastName, address, email } = req.query;
+    const conditionFind = { isDeleted: false };
 
-        const conditionFind =  {isDeleted: false};
+    if (firstName) conditionFind.firstName = fuzzySearch(firstName);
+    if (lastName) conditionFind.lastName = fuzzySearch(lastName);
+    if (address) conditionFind.address = fuzzySearch(address);
+    if (email) conditionFind.email = fuzzySearch(email);
 
-        if(name){
-            conditionFind.name = fuzzySearch(name)
-        };
+    const payload = await Employee.find(conditionFind);
 
-        const payload = await Employee.find(conditionFind);
-
-        res.send(200, {
-            payload: payload,
-            message: "Tim kiếm tên thành công"
-        });
-    } catch (error) {
-        res.send(400, {
-            error,
-            message: "Tim kiếm tên thất bại"
-        });
-    }
+    res.send(200, {
+      payload,
+      message: "Tìm kiếm thành công"
+    });
+  } catch (error) {
+    res.send(400, {
+      error,
+      message: "Tìm kiếm không thành công"
+    });
+  }
 };
+
 
 /** CREATE */
 
 const create = async function (req, res, next) {
+    console.log('«««««  req.body »»»»»', req.body);
     const { firstName, lastName , birthday, email, phoneNumber, isDeleted, address, password } = req.body;
-
     try {
         const newEmployee = new Employee({
             firstName, 
@@ -92,12 +93,13 @@ const create = async function (req, res, next) {
         const payload = await newEmployee.save();
 
 
-        res.send(200, {
+        return res.send(200, {
             payload: payload,
             message: "Tạo thành công"
         });
     } catch (err) {
-        res.send(400, {
+        console.log('««««« err »»»»»', err);
+        return res.send(400, {
             err,
             message: "Tạo thất bại"
         });

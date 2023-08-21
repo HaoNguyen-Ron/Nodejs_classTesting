@@ -1,20 +1,19 @@
 const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
+const mongooseLeanVirtuals = require('mongoose-lean-virtuals');
 
 const employeeSchema = new Schema(
   {
     firstName: {
       type: String,
       required: [true, "Tên nhân viên không được bỏ trống"],
-      maxLength: [20, "Tên nhân viên không vượt quá 20 kí tự"],
-      unique: [true, "Tên nhân viên không được trùng nhau"],
+      maxLength: [20, "Tên nhân viên không vượt quá 20 kí tự"]
     },
 
     lastName: {
       type: String,
       required: [true, "Tên nhân viên không được bỏ trống"],
-      maxLength: [20, "Tên nhân viên không vượt quá 20 kí tự"],
-      unique: [true, "Tên nhân viên không được trùng nhau"],
+      maxLength: [20, "Tên nhân viên không vượt quá 20 kí tự"]
     },
 
     email: {
@@ -76,6 +75,15 @@ const employeeSchema = new Schema(
   }
 
 );
+
+employeeSchema.virtual('fullName').get(function () {
+  return `${this.firstName} ${this.lastName}`;
+});
+// Config
+employeeSchema.set('toJSON', { virtuals: true });
+employeeSchema.set('toObject', { virtuals: true });
+//
+employeeSchema.plugin(mongooseLeanVirtuals);
 
 const Employee = model("employees", employeeSchema);
 module.exports = Employee;

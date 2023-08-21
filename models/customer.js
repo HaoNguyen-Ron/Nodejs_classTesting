@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const { Schema, model } = mongoose;
+const mongooseLeanVirtuals = require('mongoose-lean-virtuals');
 
 const customerSchema = new Schema(
   {
@@ -7,14 +8,12 @@ const customerSchema = new Schema(
       type: String,
       required: [true, "Tên nhân viên không được bỏ trống"],
       maxLength: [20, "Tên nhân viên không vượt quá 20 kí tự"],
-      unique: [true, "Tên nhân viên không được trùng nhau"],
     },
 
     lastName: {
       type: String,
       required: [true, "Tên nhân viên không được bỏ trống"],
       maxLength: [20, "Tên nhân viên không vượt quá 20 kí tự"],
-      unique: [true, "Tên nhân viên không được trùng nhau"],
     },
 
     email: {
@@ -76,6 +75,14 @@ const customerSchema = new Schema(
   }
 
 );
+customerSchema.virtual('fullName').get(function () {
+  return `${this.firstName} ${this.lastName}`;
+});
+// Config
+customerSchema.set('toJSON', { virtuals: true });
+customerSchema.set('toObject', { virtuals: true });
+//
+customerSchema.plugin(mongooseLeanVirtuals);
 
 const Customer = model("customers", customerSchema);
 module.exports = Customer;
