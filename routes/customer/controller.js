@@ -50,27 +50,27 @@ const getDetail = async function (req, res, next) {
 //search
 const search = async function (req, res, next) {
     try {
-        const { name } = req.query;
-
-        const conditionFind =  {isDeleted: false};
-
-        if(name){
-            conditionFind.name = fuzzySearch(name)
-        };
-
-        const payload = await Customer.find(conditionFind);
-
-        res.send(200, {
-            payload: payload,
-            message: "Tim kiếm tên thành công"
-        });
-    } catch (error) {
-        res.send(400, {
-            error,
-            message: "Tim kiếm tên thất bại"
-        });
-    }
-};
+     const { firstName, lastName, address, email } = req.query;
+     const conditionFind = { isDeleted: false };
+ 
+     if (firstName) conditionFind.firstName = fuzzySearch(firstName);
+     if (lastName) conditionFind.lastName = fuzzySearch(lastName);
+     if (address) conditionFind.address = fuzzySearch(address);
+     if (email) conditionFind.email = fuzzySearch(email);
+ 
+     const payload = await Customer.find(conditionFind);
+ 
+     res.send(200, {
+       payload,
+       message: "Tìm kiếm thành công"
+     });
+   } catch (error) {
+     res.send(400, {
+       error,
+       message: "Tìm kiếm không thành công"
+     });
+   }
+ };
 
 /** CREATE */
 
