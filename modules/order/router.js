@@ -57,6 +57,13 @@ const routes = [
   },
 ]
 
+for (const route of routes) {
+  // router.route('/').get()
+  // router.route('/').post()
+  //  ==> router.route('/')[router.method] : dynamic 
+  router.route(route.path)[route.method](...route.validators, ...route.handlers)
+}
+
 // router.route('/')
 //   .get(getAll)
 //   .post(validateSchema(createSchema), create)
