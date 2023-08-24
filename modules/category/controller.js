@@ -2,11 +2,9 @@ const { default: mongoose } = require('mongoose');
 
 const { fuzzySearch } = require('../../utils');
 
-const Category = require('../../models/category');
+const Category = require('./model');
 
-
-// mongoose.connect('mongodb://localhost:27017/node-32-database');
-mongoose.connect('mongodb://127.0.0.1:27017/node-32-database');
+//------------------------------------------GET-----------------------------------------------//
 
 const getAll = async (req, res, next) => {
     try {
@@ -48,7 +46,8 @@ const getDetail = async function (req, res, next) {
     }
 };
 
-//search
+//-----------------------------------------------SEARCH--------------------------------------------//
+
 const search = async function (req, res, next) {
     try {
         const { name } = req.query;
@@ -73,7 +72,7 @@ const search = async function (req, res, next) {
     }
 };
 
-/** CREATE */
+/** ------------------------------------------CREATE--------------------------------------------- */
 
 const create = async function (req, res, next) {
     const { name, isDeleted, description } = req.body;
@@ -98,7 +97,7 @@ const create = async function (req, res, next) {
     }
 };
 
-/** UPDATE */
+/** ---------------------------------------UPDATE----------------------------------------- */
 const update = async function (req, res, next) {
     try {
       const { id } = req.params;
@@ -126,7 +125,7 @@ const update = async function (req, res, next) {
   };
 
 
-/** DELETE */
+/**---------------------------------------- DELETE-------------------------------------- */
 const hardDelete = async function (req, res, next) {
 
     try {
