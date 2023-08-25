@@ -60,9 +60,14 @@ const routes = [
 for (const route of routes) {
   // router.route('/').get()
   // router.route('/').post()
+  // why ? coz: inside get() we have get(getAll) so we cannot code like this:
+  // router.route(route.path, route.method(...route.validators, ...route.handlers) XXXX
+  // or 
   //  ==> router.route('/')[router.method] : dynamic 
   router.route(route.path)[route.method](...route.validators, ...route.handlers)
 }
+
+///----------- re-factor from this below :
 
 // router.route('/')
 //   .get(getAll)

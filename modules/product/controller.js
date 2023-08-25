@@ -17,7 +17,6 @@ module.exports = {
 
       return res.send({ code: 200, payload: results });
     } catch (err) {
-      console.log('««««« err »»»»»', err);
       return res.send(404, {
         message: "Không tìm thấy",
         err,
@@ -29,6 +28,7 @@ module.exports = {
     try {
       const { page, pageSize } = req.query;
       const limit = pageSize || 12;
+
       const skip = limit * (page - 1) || 0;
 
       const conditionFind = { isDeleted: false };
@@ -40,7 +40,7 @@ module.exports = {
         .limit(limit)
         .lean();
 
-      const total = await Product.countDocuments(conditionFind)
+      const total = await Product.countDocuments(conditionFind);
 
       return res.send({ code: 200, payload: results, total });
     } catch (err) {
@@ -71,8 +71,10 @@ module.exports = {
         const compareStart = { $lte: ['$price', priceEnd] }; // '$field'
         const compareEnd = { $gte: ['$price', priceStart] };
         conditionFind.$expr = { $and: [compareStart, compareEnd] };
+
       } else if (priceStart) {
         conditionFind.price = { $gte: parseFloat(priceStart) };
+
       } else if (priceEnd) {
         conditionFind.price = { $lte: parseFloat(priceEnd) };
       }
@@ -166,7 +168,7 @@ module.exports = {
       //     message: "Danh mục không khả dụng",
       //   });
       // }
-
+      
       const newRecord = new Product({
         name, price, discount, stock, description, supplierId, categoryId,
       });
@@ -234,7 +236,6 @@ module.exports = {
       return res.status(400).json({ message: "Update failed" });
 
     } catch (error) {
-      console.log('««««« error »»»»»', error);
       return res.send(404, {
         message: "Có lỗi",
         error,

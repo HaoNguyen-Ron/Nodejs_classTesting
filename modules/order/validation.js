@@ -69,7 +69,7 @@ module.exports = {
 
       paymentType: yup.string()
         .required()
-        .oneOf(['CASH', 'CREDIT CARD'], 'Phương thức thanh toán không hợp lệ'),
+        .oneOf(['CASH', 'CREDIT_CARD'], 'Phương thức thanh toán không hợp lệ'),
 
       status: yup.string()
         .required()

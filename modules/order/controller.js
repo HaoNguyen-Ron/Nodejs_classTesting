@@ -1,5 +1,11 @@
-const { Order, Customer, Employee, Product } = require('./model');
+const Order = require('./model');
+
+const Product = require("./../product/model");
+const Employee = require('./../employee/model');
+const Customer = require('./../customer/model')
 const { asyncForEach } = require('../../utils');
+
+
 
 module.exports = {
   //---------------------------------------GET----------------------------------------------//
@@ -108,6 +114,7 @@ module.exports = {
         payload: result,
       });
     } catch (err) {
+      console.log('««««« err »»»»»', err);
       return res.status(500).json({ code: 500, error: err });
     }
   },
