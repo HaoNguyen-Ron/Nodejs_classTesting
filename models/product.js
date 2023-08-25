@@ -66,14 +66,14 @@ productSchema.virtual('discountedPrice').get(function () {
 
 // Virtual with Populate
 productSchema.virtual('category', {
-  ref: 'Categories',
+  ref: 'categories',
   localField: 'categoryId',
   foreignField: '_id',
   justOne: true,
 });
 
 productSchema.virtual('supplier', {
-  ref: 'Suppliers',
+  ref: 'suppliers',
   localField: 'supplierId',
   foreignField: '_id',
   justOne: true,
