@@ -118,7 +118,7 @@ module.exports = {
     }
   },
 
-  //CREATE
+  //----------------------------------------------CREATE-----------------------------------------------
   create: async (req, res, next) => {
     try {
       const { name, price, discount, stock, description, supplierId, categoryId } = req.body;
