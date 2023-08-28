@@ -1,7 +1,7 @@
 
 const { fuzzySearch } = require('../../utils');
 
-const { Employee } = require('./model');
+const  Employee  = require('./model');
 
 
 const getAll = async (req, res, next) => {
@@ -39,7 +39,7 @@ const getDetail = async function (req, res, next) {
         res.send(400, {
             error,
             message: "Tìm kiếm không thành công hoặc sai mã Id"
-        });
+        });     
     }
 };
 
@@ -97,35 +97,27 @@ const search = async function (req, res, next) {
 /** CREATE */
 
 const create = async function (req, res, next) {
-    console.log('«««««  req.body »»»»»', req.body);
-    const { firstName, lastName, birthday, email, phoneNumber, isDeleted, address, password } = req.body;
     try {
-        const newEmployee = new Employee({
-            firstName,
-            lastName,
-            birthday,
-            email,
-            phoneNumber,
-            isDeleted,
-            address,
-            password
-        });
-
-        const payload = await newEmployee.save();
-
-
-        return res.send(200, {
-            payload: payload,
-            message: "Tạo thành công"
-        });
-    } catch (err) {
-        console.log('««««« err »»»»»', err);
-        return res.send(400, {
-            err,
-            message: "Tạo thất bại"
-        });
+      const { firstName, lastName, email, phoneNumber, address, password, birthday } = req.body;
+  
+      const newEmployee = new Employee({
+        firstName, lastName, email, phoneNumber, address, password, birthday
+      });
+  
+      const payload = await newEmployee.save();
+  
+      res.send(200, {
+        payload,
+        message: "Tạo thành công"
+      });
+    } catch (error) {
+      console.log('««««« error »»»»»', error);
+      res.send(400, {
+        error,
+        message: "Tạo không thành công"
+      });
     }
-};
+  };
 
 /** UPDATE */
 const update = async function (req, res, next) {
