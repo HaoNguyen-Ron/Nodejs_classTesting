@@ -66,7 +66,7 @@ const employeeSchema = new Schema(
     },
 
     birthday: {
-        type: String
+        type: Date
     }
   },
   {

@@ -66,7 +66,7 @@ const customerSchema = new Schema(
     },
 
     birthday: {
-        type: String
+        type: Date,
     }
   },
   {
