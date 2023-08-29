@@ -44,14 +44,11 @@ const routes = [
     validators: [validateSchema(checkIdSchema)],
     handlers: [hardDelete]
   },
-]
+];
 
 for (const route of routes) {
-  // router.route('/').get()
-  // router.route('/').post()
-  //  ==> router.route('/')[router.method] : dynamic 
   router.route(route.path)[route.method](...route.validators, ...route.handlers)
-}
+};
 
 
 // router.route('/')

@@ -41,6 +41,10 @@ const routes = [
         path: '/orders',
         router: require('./modules/order/router')
     },
+    {
+        path: '/questions',
+        router: require('./modules/question/router')
+    },
 ];
 
 module.exports = routes
