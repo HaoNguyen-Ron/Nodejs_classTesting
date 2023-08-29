@@ -1,5 +1,9 @@
-const { Product, Category, Supplier } = require('../../models');
 const { fuzzySearch } = require('../../utils');
+
+const Product = require('./model');
+const Category = require('./../category/model')
+const Supplier = require('./../supplier/model')
+
 
 module.exports = {
   getAll: async (req, res, next) => { // NOTE
@@ -13,7 +17,6 @@ module.exports = {
 
       return res.send({ code: 200, payload: results });
     } catch (err) {
-      console.log('««««« err »»»»»', err);
       return res.send(404, {
         message: "Không tìm thấy",
         err,
@@ -25,6 +28,7 @@ module.exports = {
     try {
       const { page, pageSize } = req.query;
       const limit = pageSize || 12;
+
       const skip = limit * (page - 1) || 0;
 
       const conditionFind = { isDeleted: false };
@@ -36,7 +40,7 @@ module.exports = {
         .limit(limit)
         .lean();
 
-      const total = await Product.countDocuments(conditionFind)
+      const total = await Product.countDocuments(conditionFind);
 
       return res.send({ code: 200, payload: results, total });
     } catch (err) {
@@ -47,9 +51,10 @@ module.exports = {
     }
   },
 
+  //search
   search: async (req, res, next) => {
     try {
-      const { name, categoryId, priceStart, priceEnd, supplierId } = req.query;
+      const { name, categoryId, priceStart, priceEnd, supplierId, limit, stockStart, stockEnd, page } = req.query;
       const conditionFind = { isDeleted: false };
 
       if (name) conditionFind.name = fuzzySearch(name);
@@ -66,8 +71,10 @@ module.exports = {
         const compareStart = { $lte: ['$price', priceEnd] }; // '$field'
         const compareEnd = { $gte: ['$price', priceStart] };
         conditionFind.$expr = { $and: [compareStart, compareEnd] };
+
       } else if (priceStart) {
         conditionFind.price = { $gte: parseFloat(priceStart) };
+
       } else if (priceEnd) {
         conditionFind.price = { $lte: parseFloat(priceEnd) };
       }
@@ -87,7 +94,7 @@ module.exports = {
     }
   },
 
-   getDetail: async (req, res, next) => {
+  getDetail: async (req, res, next) => {
     try {
       const { id } = req.params;
 
@@ -111,6 +118,7 @@ module.exports = {
     }
   },
 
+  //----------------------------------------------CREATE-----------------------------------------------
   create: async (req, res, next) => {
     try {
       const { name, price, discount, stock, description, supplierId, categoryId } = req.body;
@@ -127,7 +135,7 @@ module.exports = {
         _id: supplierId,
         isDeleted: false,
       });
-      const getCategory =  Category.findOne({
+      const getCategory = Category.findOne({
         _id: categoryId,
         isDeleted: false,
       });
@@ -138,7 +146,7 @@ module.exports = {
       if (!existSupplier) error.push("Nhà cung cấp không khả dụng");
       if (!existCategory) error.push("Danh mục không khả dụng");
 
-      if (error.length > 0 ) {
+      if (error.length > 0) {
         return res.send(400, {
           error,
           message: "Không khả dụng"
@@ -160,7 +168,7 @@ module.exports = {
       //     message: "Danh mục không khả dụng",
       //   });
       // }
-
+      
       const newRecord = new Product({
         name, price, discount, stock, description, supplierId, categoryId,
       });
@@ -180,6 +188,7 @@ module.exports = {
     }
   },
 
+  //UPDATE
   update: async (req, res, next) => {
     try {
       const { id } = req.params;
@@ -225,8 +234,8 @@ module.exports = {
       }
 
       return res.status(400).json({ message: "Update failed" });
+
     } catch (error) {
-      console.log('««««« error »»»»»', error);
       return res.send(404, {
         message: "Có lỗi",
         error,
@@ -234,6 +243,7 @@ module.exports = {
     }
   },
 
+  //DELETE
   hardDelete: async (req, res, next) => {
     try {
       const { id } = req.params;

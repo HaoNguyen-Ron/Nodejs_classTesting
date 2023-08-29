@@ -2,25 +2,22 @@ const { default: mongoose } = require('mongoose');
 
 const { fuzzySearch } = require('../../utils');
 
-const {Employee} = require('../../models');
-
-// mongoose.connect('mongodb://localhost:27017/node-32-database');
-mongoose.connect('mongodb://127.0.0.1:27017/node-32-database');
+const Customer = require('./model');
 
 
 const getAll = async (req, res, next) => {
     try {
-        const payload = await Employee.find({
+        const payload = await Customer.find({
             isDeleted: false
         });
         res.send(200, {
             payload: payload,
-            message: "Tạo thành công"
+            message: "Tìm kiếm tất cả thành công"
         });
     } catch (error) {
         res.send(400, {
             error,
-            message: "Tạo thất bại"
+            message: "Tìm kiếm tất cả thất bại"
         });
     }
 };
@@ -30,7 +27,7 @@ const getDetail = async function (req, res, next) {
     try {
         const { id } = req.params;
 
-        const payload = await Employee.findOne({
+        const payload = await Customer.findOne({
             _id: id,
             isDeleted: false,
         });
@@ -49,37 +46,36 @@ const getDetail = async function (req, res, next) {
 
 //search
 const search = async function (req, res, next) {
-   try {
-    const { firstName, lastName, address, email } = req.query;
-    const conditionFind = { isDeleted: false };
-
-    if (firstName) conditionFind.firstName = fuzzySearch(firstName);
-    if (lastName) conditionFind.lastName = fuzzySearch(lastName);
-    if (address) conditionFind.address = fuzzySearch(address);
-    if (email) conditionFind.email = fuzzySearch(email);
-
-    const payload = await Employee.find(conditionFind);
-
-    res.send(200, {
-      payload,
-      message: "Tìm kiếm thành công"
-    });
-  } catch (error) {
-    res.send(400, {
-      error,
-      message: "Tìm kiếm không thành công"
-    });
-  }
-};
-
+    try {
+     const { firstName, lastName, address, email } = req.query;
+     const conditionFind = { isDeleted: false };
+ 
+     if (firstName) conditionFind.firstName = fuzzySearch(firstName);
+     if (lastName) conditionFind.lastName = fuzzySearch(lastName);
+     if (address) conditionFind.address = fuzzySearch(address);
+     if (email) conditionFind.email = fuzzySearch(email);
+ 
+     const payload = await Customer.find(conditionFind);
+ 
+     res.send(200, {
+       payload,
+       message: "Tìm kiếm thành công"
+     });
+   } catch (error) {
+     res.send(400, {
+       error,
+       message: "Tìm kiếm không thành công"
+     });
+   }
+ };
 
 /** CREATE */
 
 const create = async function (req, res, next) {
-    console.log('«««««  req.body »»»»»', req.body);
     const { firstName, lastName , birthday, email, phoneNumber, isDeleted, address, password } = req.body;
+
     try {
-        const newEmployee = new Employee({
+        const newCustomer = new Customer({
             firstName, 
             lastName , 
             birthday, 
@@ -90,16 +86,15 @@ const create = async function (req, res, next) {
             password 
         });
 
-        const payload = await newEmployee.save();
+        const payload = await newCustomer.save();
 
 
-        return res.send(200, {
+        res.send(200, {
             payload: payload,
             message: "Tạo thành công"
         });
     } catch (err) {
-        console.log('««««« err »»»»»', err);
-        return res.send(400, {
+        res.send(400, {
             err,
             message: "Tạo thất bại"
         });
@@ -112,7 +107,7 @@ const update = async function (req, res, next) {
     try {
       const { id } = req.params;
   
-      const payload = await Employee.findOneAndUpdate(
+      const payload = await Customer.findOneAndUpdate(
         { _id: id, isDeleted: false },
         { ...req.body },
         { new: true },
@@ -126,7 +121,6 @@ const update = async function (req, res, next) {
       }
       return res.send(404, { message: "Không tìm thấy" });
     } catch (error) {
-      console.log('««««« error »»»»»', error);
       res.send(400, {
         error,
         message: "Cập nhập không thành công"
@@ -140,7 +134,7 @@ const hardDelete = async function (req, res, next) {
 
     try {
         const { id } = req.params;
-        const payload = await Employee.findOneAndUpdate(
+        const payload = await Customer.findOneAndUpdate(
             {
                 _id: id,
                 isDeleted: false

@@ -3,16 +3,10 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-// const { default: mongoose } = require('mongoose');
+const { default: mongoose } = require('mongoose');
+const routes = require('./router')
 
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var productRouter = require('./routes/product/router');
-var categoryRouter = require('./routes/category/router');
-var suppliersRouter = require('./routes/supplier/router');
-var employeesRouter = require('./routes/employee/router');
-var customerRouter = require('./routes/customer/router');
 
 var app = express();
 
@@ -28,14 +22,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // // mongoose.connect('mongodb://localhost:27017/node-32-database');
 // mongoose.connect('mongodb://127.0.0.1:27017/node-32-database');
+mongoose.connect('mongodb+srv://saltymeatball:0zs2KQoCdUe8pAYY@cluster0.f1rylpl.mongodb.net/node-32-database');
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
-app.use('/products', productRouter);
-app.use('/categories', categoryRouter);
-app.use('/suppliers', suppliersRouter);
-app.use('/employees', employeesRouter);
-app.use('/customers', customerRouter);
+for(const route of routes) {
+  app.use(route.path, route.router)
+}
 
 
 // catch 404 and forward to error handler

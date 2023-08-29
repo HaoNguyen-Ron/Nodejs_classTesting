@@ -33,17 +33,15 @@ const validationQuerySchema = yup.object().shape({
             return ObjectId.isValid(value);
         }),
 
-        priceStart: yup.number().test('Giá không hợp lệ', (value, context) => {
+        priceStart: yup.number().min(0).test('Giá không hợp lệ', (value, context) => {
             if (!value) return true; // Không điền giá kết thúc
 
             if (context.parent.priceEnd) {
                 return value < context.parent.priceEnd // Giá kết thúc phải lớn hơn giá bắt đầu (nếu có)
             };
-
-            return value > 0;
         }),
 
-        priceEnd: yup.number().test('Giá không hợp lệ', (value, context) => {
+        priceEnd: yup.number().min(0).test('Giá không hợp lệ', (value, context) => {
             if (!value) return true; // Không điền giá kết thúc
 
             if (context.parent.priceStart) {
@@ -52,7 +50,7 @@ const validationQuerySchema = yup.object().shape({
 
             return value > 0;
         }),
-        page: yup.number().min(0),
+        page: yup.number().min(1),
 
         limit: yup.number().min(2),
 
@@ -67,9 +65,9 @@ const validationQuerySchema = yup.object().shape({
 
         stockEnd: yup.number(),
 
-        discountStart: yup.number().min(0),
+        discountStart: yup.number().min(75),
 
-        discountEnd: yup.number().max(50),
+        discountEnd: yup.number().max(75),
 
         skip: yup.number(),
 
