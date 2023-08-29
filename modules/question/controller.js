@@ -407,11 +407,9 @@ module.exports = {
   question5: async (req, res, next) => {
     try {
       
-      const { year  } = req.query;
-      const conditionFind = {
-        $expr: {
-          $eq: [{ $year: '$birthday' }, year],
-        },
+      const { birthday  } = req.query;
+      const conditionFind = { 
+        address: fuzzySearch( Date.parse(birthday))
       };
       console.log('««««« conditionFind »»»»»', conditionFind);
 
