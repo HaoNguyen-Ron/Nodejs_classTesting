@@ -19,7 +19,7 @@ productSchema.virtual('total').get(function () {
 
 // Virtual with Populate
 productSchema.virtual('product', {
-    ref: 'Product',
+    ref: 'products',
     localField: 'productId',
     foreignField: '_id',
     justOne: true,
