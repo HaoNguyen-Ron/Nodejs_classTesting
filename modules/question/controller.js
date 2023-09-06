@@ -331,7 +331,7 @@ module.exports = {
       return res.status(500).json({ code: 500, error: err });
     }
   },
-  //-----------------aggregate reverse
+  //-----------------aggregate reverse (trong bảng này không có liên kết với bảng khác)
   question3e: async (req, res, next) => {
     try {
       const s = { $subtract: [100, '$discount'] }; // (100 - 10) s => 90
@@ -1054,5 +1054,124 @@ module.exports = {
     
   }, /// khong hien nv so 4 
 
+  question25: async (req, res, next) => {
+    try {
+      // const conditionFind = ;
+
+      let results = await Product.aggregate()
+      .lookup({
+        from: 'orders', 
+        localField: '_id',
+        foreignField: 'productList.productId',
+        as: 'orders',
+      })
+      .match({
+        orders: { $size: 0 },
+      })
+      .project({
+        id: 1,
+        name: 1,
+        price: 1,
+        stock: 1,
+      })
+
+
+      let total = await Product.countDocuments();
+
+      return res.send({
+        code: 200,
+        total,
+        totalResult: results.length,
+        payload: results,
+      });
+    } catch (err) {
+      console.log('««««« err »»»»»', err);
+      return res.status(500).json({ code: 500, error: err });
+    }
+  },
+
+  question26: async (req, res, next) => {
+    try {
+      let { fromDate, toDate } = req.query;
+      const conditionFind = getQueryDateTime(fromDate, toDate);
+
+      let results = await Supplier.aggregate()
+        .lookup({
+          from: 'products',
+          localField: '_id',
+          foreignField: 'supplierId',
+          as: 'products',
+        })
+        .unwind({
+          path: '$products',
+          preserveNullAndEmptyArrays: true,
+        })
+        .lookup({
+          from: 'orders',
+          localField: 'products._id',
+          foreignField: 'orderDetails.productId',
+          as: 'orders',
+        })
+        .unwind({
+          path: '$orders',
+          preserveNullAndEmptyArrays: true,
+        })
+        .match({
+            $or: [
+              {
+                $and: [
+                  { orders: { $ne: null } },
+                  {
+                    $or: [
+                      { 'orders.createdDate': { $lte: fromDate } },
+                      { 'orders.createdDate': { $gte: toDate } },
+                    ],
+                  },
+                ],
+              },
+              {
+                orders: null,
+              },
+            ],
+          })
+          .lookup({
+            from: 'suppliers',
+            localField: 'supplierId',
+            foreignField: '_id',
+            as: 'suppliers',
+          })
+          .project({
+            _id: 0,
+            suppliers: 1,
+          })
+          .unwind('suppliers')
+          .project({
+            _id: '$suppliers._id',
+            name: '$suppliers.name',
+            email: '$suppliers.email',
+            phoneNumber: '$suppliers.phoneNumber',
+            address: '$suppliers.address',
+          })
+          .group({
+            _id: '$_id',
+            name: { $first: '$name' },
+            phoneNumber: { $first: '$phoneNumber' },
+            email: { $first: '$email' },
+            address: { $first: '$address' },
+          })
+
+      let total = await Supplier.countDocuments();
+
+      return res.send({
+        code: 200,
+        total,
+        totalResult: results.length,
+        payload: results,
+      });
+    } catch (err) {
+      console.log('««««« err »»»»»', err);
+      return res.status(500).json({ code: 500, error: err });
+    }
+  },
   
 };
