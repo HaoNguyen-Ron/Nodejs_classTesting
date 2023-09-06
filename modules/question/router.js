@@ -37,9 +37,9 @@ const {
   question19,
   question20,
   question21,
-  // question22,
-  // question23,
-  // question24,
+  question22,
+  question23,
+  question24,
   // question25,
   // question26,
   // question26b,
@@ -226,6 +226,24 @@ const routes = [
     method: 'get',
     validators: [],
     handlers: [question21],
+  },
+  {
+    path: '/22',
+    method: 'get',
+    validators: [],
+    handlers: [question22],
+  },
+  {
+    path: '/23',
+    method: 'get',
+    validators: [],
+    handlers: [question23],
+  },
+  {
+    path: '/24',
+    method: 'get',
+    validators: [],
+    handlers: [question24],
   },
 ];
 

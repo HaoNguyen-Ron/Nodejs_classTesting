@@ -304,7 +304,8 @@ module.exports = {
       //   },
       // ]);
 
-      //-------------Ver-2
+
+      //-------------Ver-2 + addField
       let results = await Product.aggregate()
         .addFields({ disPrice: d })
         .match({ $expr: { $lte: ['$disPrice', 10000] } })
@@ -330,7 +331,7 @@ module.exports = {
       return res.status(500).json({ code: 500, error: err });
     }
   },
- //-----------------aggregate reverse
+  //-----------------aggregate reverse
   question3e: async (req, res, next) => {
     try {
       const s = { $subtract: [100, '$discount'] }; // (100 - 10) s => 90
@@ -464,7 +465,7 @@ module.exports = {
 
       let today;
 
-      if(!date){
+      if (!date) {
         today = new Date()
       } else {
         today = new Date(date)
@@ -504,7 +505,8 @@ module.exports = {
       const { status } = req.query;
       const conditionFind = {
         $expr: {
-          $eq: ['$status' , status],
+          $eq: ['$status', status],
+          // $eq: { status }, //...................................????? tại sao không dụng đc như câu 8a
         },
       };
       console.log('««««« conditionFind »»»»»', conditionFind);
@@ -523,7 +525,7 @@ module.exports = {
       console.log('««««« err »»»»»', err);
       return res.status(500).json({ code: 500, error: err });
     }
-  },
+  }, // ????
 
   question8a: async (req, res, next) => {
     try {
@@ -619,8 +621,8 @@ module.exports = {
       const conditionFind = {
         $expr: {
           $or: [
-            {$and: [compareStatus, compareFromDate]},
-            {$and: [compareStatus, compareToDate]}
+            { $and: [compareStatus, compareFromDate] },
+            { $and: [compareStatus, compareToDate] }
           ]
         },
       };
@@ -665,21 +667,25 @@ module.exports = {
           description: { $first: '$description' },
           totalProduct: {  //ADD FIELD (KHÔNG CẦN PHẢI THÊM METHOD addField)
             // $sum: '$products.stock',
-            $sum: {$cond: { if: { // IF ElSE của mongodb
-              $and : [
-                {$gt: ['$products.stock', 0]},
-              ]
-            }, then: 1, else: 0} },
-          },  
+            $sum: {
+              $cond: {
+                if: { // IF ElSE của mongodb
+                  $and: [
+                    { $gt: ['$products.stock', 0] },
+                  ]
+                }, then: 1, else: 0
+              }
+            },
+          },
           totalStock: {  //ADD FIELD (KHÔNG CẦN PHẢI THÊM METHOD addField)
             // $sum: '$products.stock',
             $sum: '$products.stock'
-          },  
+          },
         })
         .sort({
-          description:  1,
+          description: 1,
         });
-          
+
       let total = await Category.countDocuments();
 
       return res.send({
@@ -716,17 +722,21 @@ module.exports = {
           address: { $first: '$address' },
           totalProduct: {  //ADD FIELD (KHÔNG CẦN PHẢI THÊM METHOD addField)
             // $sum: '$products.stock',
-            $sum: {$cond: { if: { // IF ElSE của mongodb
-              $and : [
-                {$gt: ['$products.stock', 0]},
-              ]
-            }, then: 1, else: 0} },
-          },  
+            $sum: {
+              $cond: {
+                if: { // IF ElSE của mongodb
+                  $and: [
+                    { $gt: ['$products.stock', 0] },
+                  ]
+                }, then: 1, else: 0
+              }
+            },
+          },
         })
         .sort({
-          name:  1,
+          name: 1,
         });
-          
+
       let total = await Supplier.countDocuments();
 
       return res.send({
@@ -740,7 +750,8 @@ module.exports = {
       return res.status(500).json({ code: 500, error: err });
     }
   },
-
+  
+  //-------------------unwind + sort
   question19: async (req, res, next) => {
     try {
 
@@ -763,17 +774,21 @@ module.exports = {
           address: { $first: '$address' },
           totalProduct: {  //ADD FIELD (KHÔNG CẦN PHẢI THÊM METHOD addField)
             // $sum: '$products.stock',
-            $sum: {$cond: { if: { // IF ElSE của mongodb
-              $and : [
-                {$gt: ['$products.stock', 0]},
-              ]
-            }, then: 1, else: 0} },
-          },  
+            $sum: {
+              $cond: {
+                if: { // IF ElSE của mongodb
+                  $and: [
+                    { $gt: ['$products.stock', 0] },
+                  ]
+                }, then: 1, else: 0
+              }
+            },
+          },
         })
         .sort({
-          name:  1,
+          name: 1,
         });
-          
+
       let total = await Supplier.countDocuments();
 
       return res.send({
@@ -809,7 +824,7 @@ module.exports = {
         .group({
           _id: '$productList.productId',
           name: { $first: '$productList.product.name' },
-          price: { $first: '$productList.product.pric e' },
+          price: { $first: '$productList.product.price' },
           discount: { $first: '$productList.product.discount' },
           stock: { $first: '$productList.product.stock' },
           countSale: { $sum: '$productList.quantity' },
@@ -840,10 +855,10 @@ module.exports = {
           ...conditionFind,
           status: { $in: ['WAITING'] },
         })
-        .unwind('orderDetails')
+        .unwind('productList')
         .lookup({
           from: 'customers',
-          localField: 'customersId',
+          localField: 'customerId',
           foreignField: '_id',
           as: 'customer',
         })
@@ -872,6 +887,172 @@ module.exports = {
     }
   },
 
+  question22: async (req, res, next) => {
+    try {
+      let { fromDate, toDate } = req.query;
+      const conditionFind = getQueryDateTime(fromDate, toDate);
 
+      let results = await Order.aggregate()
+        .match({
+          ...conditionFind,
+          status: { $in: ['WAITING'] },
+        })
+        .unwind({
+          path: '$productList',
+          preserveNullAndEmptyArrays: true,
+        })
+        .addFields({
+          total: {
+            $sum: {
+              $divide: [
+                {
+                  $multiply: [
+                    '$productList.price',
+                    { $subtract: [100, '$productList.discount'] },
+                    '$productList.quantity',
+                  ],
+                },
+                100,
+              ],
+            },
+          },
+        })
+        .lookup({
+          from: 'customers',
+          localField: 'customerId',
+          foreignField: '_id',
+          as: 'customer',
+        })
+        .unwind('customer')
+        .group({
+          _id: '$customer._id',
+          firstName: { $first: '$customer.firstName' },
+          lastName: { $first: '$customer.lastName' },
+          email: { $first: '$customer.email' },
+          phoneNumber: { $first: '$customer.phoneNumber' },
+          address: { $first: '$customer.address' },
+          birthday: { $first: '$customer.birthday' },
+          total: { $sum: '$total' },
+        });
+
+      let total = await Order.countDocuments();
+
+      return res.send({
+        code: 200,
+        total,
+        totalResult: results.length,
+        payload: results,
+      });
+    } catch (err) {
+      console.log('««««« err »»»»»', err);
+      return res.status(500).json({ code: 500, error: err });
+    }
+  },
+
+  question23: async (req, res, next) => {
+    try {
+
+      let results = await Order.aggregate()
+      .unwind({
+        path: '$productList',
+        preserveNullAndEmptyArrays: true,
+      })
+      .addFields({
+        total: {
+          $sum: {
+            $divide: [
+              {
+                $multiply: [
+                  '$productList.price',
+                  { $subtract: [100, '$productList.discount'] },
+                  '$productList.quantity',
+                ],
+              },
+              100,
+            ],
+          },
+        },
+      })
+
+      let total = await Order.countDocuments();
+
+      return res.send({
+        code: 200,
+        total,
+        totalResult: results.length,
+        payload: results,
+      });
+    } catch (err) {
+      console.log('««««« err »»»»»', err);
+      return res.status(500).json({ code: 500, error: err });
+    }
+  },
+
+  question24: async (req, res, next) => {
+    try {
+      let results = await Order.aggregate()
+        .unwind({
+          path: '$productList',
+          preserveNullAndEmptyArrays: true,
+        })
+        .addFields({
+          total: {
+            $sum: {
+              $divide: [
+                {
+                  $multiply: [
+                    '$productList.price',
+                    { $subtract: [100, '$productList.discount'] },
+                    '$productList.quantity',
+                  ],
+                },
+                100,
+              ],
+            },
+          },
+        })
+        .lookup({
+          from: 'employees',
+          localField: 'employeeId',
+          foreignField: '_id',
+          as: 'employee',
+        })
+        // .unwind('employee')
+        .unwind(
+          {
+            path: '$employee',
+            preserveNullAndEmptyArrays: true,
+          }
+        )
+        .group({
+          _id: '$employee._id',
+          firstName: { $first: '$employee.firstName' },
+          lastName: { $first: '$employee.lastName' },
+          email: { $first: '$employee.email' },
+          phoneNumber: { $first: '$employee.phoneNumber' },
+          address: { $first: '$employee.address' },
+          birthday: { $first: '$employee.birthday' },
+          password:{ $first: '$employee.password'},
+          total: { $sum: '$total' },
+        })
+        .sort({
+          lastName: 1,
+        });
+
+      let total = await Order.countDocuments();
+
+      return res.send({
+        code: 200,
+        total,
+        totalResult: results.length,
+        payload: results,
+      });
+    } catch (err) {
+      console.log('««««« err »»»»»', err);
+      return res.status(500).json({ code: 500, error: err });
+    }
     
+  }, /// khong hien nv so 4 
+
+  
 };
