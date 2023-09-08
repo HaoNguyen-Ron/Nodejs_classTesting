@@ -750,7 +750,7 @@ module.exports = {
       return res.status(500).json({ code: 500, error: err });
     }
   },
-  
+
   //-------------------unwind + sort
   question19: async (req, res, next) => {
     try {
@@ -953,26 +953,26 @@ module.exports = {
     try {
 
       let results = await Order.aggregate()
-      .unwind({
-        path: '$productList',
-        preserveNullAndEmptyArrays: true,
-      })
-      .addFields({
-        total: {
-          $sum: {
-            $divide: [
-              {
-                $multiply: [
-                  '$productList.price',
-                  { $subtract: [100, '$productList.discount'] },
-                  '$productList.quantity',
-                ],
-              },
-              100,
-            ],
+        .unwind({
+          path: '$productList',
+          preserveNullAndEmptyArrays: true,
+        })
+        .addFields({
+          total: {
+            $sum: {
+              $divide: [
+                {
+                  $multiply: [
+                    '$productList.price',
+                    { $subtract: [100, '$productList.discount'] },
+                    '$productList.quantity',
+                  ],
+                },
+                100,
+              ],
+            },
           },
-        },
-      })
+        })
 
       let total = await Order.countDocuments();
 
@@ -1032,7 +1032,7 @@ module.exports = {
           phoneNumber: { $first: '$employee.phoneNumber' },
           address: { $first: '$employee.address' },
           birthday: { $first: '$employee.birthday' },
-          password:{ $first: '$employee.password'},
+          password: { $first: '$employee.password' },
           total: { $sum: '$total' },
         })
         .sort({
@@ -1051,29 +1051,30 @@ module.exports = {
       console.log('««««« err »»»»»', err);
       return res.status(500).json({ code: 500, error: err });
     }
-    
+
   }, /// khong hien nv so 4 
+
 
   question25: async (req, res, next) => {
     try {
       // const conditionFind = ;
 
       let results = await Product.aggregate()
-      .lookup({
-        from: 'orders', 
-        localField: '_id',
-        foreignField: 'productList.productId',
-        as: 'orders',
-      })
-      .match({
-        orders: { $size: 0 },
-      })
-      .project({
-        id: 1,
-        name: 1,
-        price: 1,
-        stock: 1,
-      })
+        .lookup({
+          from: 'orders',
+          localField: '_id',
+          foreignField: 'productList.productId',
+          as: 'orders',
+        })
+        .match({
+          orders: { $size: 0 },
+        })
+        .project({
+          id: 1,
+          name: 1,
+          price: 1,
+          stock: 1,
+        })
 
 
       let total = await Product.countDocuments();
@@ -1095,7 +1096,7 @@ module.exports = {
       let { fromDate, toDate } = req.query;
       const conditionFind = getQueryDateTime(fromDate, toDate);
 
-      let results = await Supplier.aggregate()
+      let results = await Product.aggregate()
         .lookup({
           from: 'products',
           localField: '_id',
@@ -1108,8 +1109,8 @@ module.exports = {
         })
         .lookup({
           from: 'orders',
-          localField: 'products._id',
-          foreignField: 'orderDetails.productId',
+          localField: 'orders._id',
+          foreignField: 'productList.productId',
           as: 'orders',
         })
         .unwind({
@@ -1117,50 +1118,263 @@ module.exports = {
           preserveNullAndEmptyArrays: true,
         })
         .match({
-            $or: [
-              {
-                $and: [
-                  { orders: { $ne: null } },
-                  {
-                    $or: [
-                      { 'orders.createdDate': { $lte: fromDate } },
-                      { 'orders.createdDate': { $gte: toDate } },
-                    ],
-                  },
-                ],
-              },
-              {
-                orders: null,
-              },
-            ],
-          })
-          .lookup({
-            from: 'suppliers',
-            localField: 'supplierId',
-            foreignField: '_id',
-            as: 'suppliers',
-          })
-          .project({
-            _id: 0,
-            suppliers: 1,
-          })
-          .unwind('suppliers')
-          .project({
-            _id: '$suppliers._id',
-            name: '$suppliers.name',
-            email: '$suppliers.email',
-            phoneNumber: '$suppliers.phoneNumber',
-            address: '$suppliers.address',
-          })
-          .group({
-            _id: '$_id',
-            name: { $first: '$name' },
-            phoneNumber: { $first: '$phoneNumber' },
-            email: { $first: '$email' },
-            address: { $first: '$address' },
-          })
+          $or: [
+            {
+              $and: [
+                { orders: { $ne: null } },
+                {
+                  $or: [
+                    { 'orders.createdDate': { $lte: fromDate } },
+                    { 'orders.createdDate': { $gte: toDate } },
+                  ],
+                },
+              ],
+            },
+            {
+              orders: null,
+            },
+          ],
+        })
+        .lookup({
+          from: 'suppliers',
+          localField: 'supplierId',
+          foreignField: '_id',
+          as: 'suppliers',
+        })
+        .project({
+          _id: 0,
+          suppliers: 1,
+        })
+        .unwind('suppliers')
+        .project({
+          _id: '$suppliers._id',
+          name: '$suppliers.name',
+          email: '$suppliers.email',
+          phoneNumber: '$suppliers.phoneNumber',
+          address: '$suppliers.address',
+        })
+        .group({
+          _id: '$_id',
+          name: { $first: '$name' },
+          phoneNumber: { $first: '$phoneNumber' },
+          email: { $first: '$email' },
+          address: { $first: '$address' },
+        })
 
-      let total = await Supplier.countDocuments();
+      let total = await Product.countDocuments();
+
+      return res.send({
+        code: 200,
+        total,
+        totalResult: results.length,
+        payload: results,
+      });
+    } catch (err) {
+      console.log('««««« err »»»»»', err);
+      return res.status(500).json({ code: 500, error: err });
+    }
+  }, // khong ra ket qua
+
+    //-----------------limit & skip
+  question27: async (req, res, next) => {
+    try {
+      let { fromDate, toDate } = req.query;
+      const conditionFind = getQueryDateTime(fromDate, toDate);
+
+      let results = await Order.aggregate()
+      .match(conditionFind)
+      .unwind('productList')
+      .addFields({
+        'productList.originalPrice': {
+          $divide: [
+            {
+              $multiply: [
+                '$productList.price',
+                { $subtract: [100, '$productList.discount'] },
+              ],
+            },
+            100,
+          ],
+        },
+      })
+      .group({
+        _id: '$employeeId',
+        totalSales: {
+          $sum: { $multiply: ['$productList.originalPrice', '$productList.quantity'] },
+        },
+      })
+      .lookup({
+        from: 'employees',
+        localField: '_id',
+        foreignField: '_id',
+        as: 'employees',
+      })
+      .unwind('employees')
+      .project({
+        employeeId: '$_id',
+        firstName: '$employees.firstName',
+        lastName: '$employees.lastName',
+        phoneNumber: '$employees.phoneNumber',
+        address: '$employees.address',
+        email: '$employees.email',
+        totalSales: 1,
+      })
+      .sort({ totalSales: -1 })
+      .limit(3)
+      .skip(0);
+
+      // .group({
+      //   _id: '$totalSales',
+      //   employees: { $push: '$$ROOT' },
+      // })
+      // // .sort({ _id: -1 })
+
+
+      let total = await Order.countDocuments();
+
+      return res.send({
+        code: 200,
+        total,
+        totalResult: results.length,
+        payload: results,
+      });
+    } catch (err) {
+      console.log('««««« err »»»»»', err);
+      return res.status(500).json({ code: 500, error: err });
+    }
+  }, 
+
+  question28: async (req, res, next) => {
+    try {
+      let { fromDate, toDate } = req.query;
+      const conditionFind = getQueryDateTime(fromDate, toDate);
+
+      let results = await Order.aggregate()
+      .match(conditionFind)
+      .unwind('productList')
+      .addFields({
+        'productList.originalPrice': {
+          $divide: [
+            {
+              $multiply: [
+                '$productList.price',
+                { $subtract: [100, '$productList.discount'] },
+              ],
+            },
+            100,
+          ],
+        },
+      })
+      .group({
+        _id: '$customerId',
+        totalBuy: {
+          $sum: { $multiply: ['$productList.originalPrice', '$productList.quantity'] },
+        },
+      })
+      .lookup({
+        from: 'customers',
+        localField: '_id',
+        foreignField: '_id',
+        as: 'customer',
+      })
+      .unwind('customer')
+      .project({//...............................??????????
+        employeeId: '$_id',
+        firstName: '$customers.firstName',
+        lastName: '$customers.lastName',
+        phoneNumber: '$customers.phoneNumber',
+        address: '$customers.address',
+        email: '$customers.email',
+        totalBuy: 1,
+      })
+      .sort({ totalBuy: -1 })
+      .limit(5)
+      .skip(0);
+
+
+      let total = await Order.countDocuments();
+
+      return res.send({
+        code: 200,
+        total,
+        totalResult: results.length,
+        payload: results,
+      });
+    } catch (err) {
+      console.log('««««« err »»»»»', err);
+      return res.status(500).json({ code: 500, error: err });
+    }
+  }, 
+
+  question29: async (req, res, next) => {
+    try {
+      let results = await Order.distinct('productList.discount')
+
+      let total = await Order.countDocuments();
+
+      return res.send({
+        code: 200,
+        total,
+        totalResult: results.length,
+        payload: results,
+      });
+    } catch (err) {
+      console.log('««««« err »»»»»', err);
+      return res.status(500).json({ code: 500, error: err });
+    }
+  },  
+  
+  question30: async (req, res, next) => {
+    try {
+      let results = await Category.aggregate()
+      .lookup({
+        from: 'products',
+        localField: '_id',
+        foreignField: 'categoryId',
+        as: 'products'
+      })
+      .unwind({
+        path: '$products',
+        preserveNullAndEmptyArrays: true,
+      })
+      .lookup({
+        from: 'orders',
+        localField: 'products._id',
+        foreignField: 'productList.productId',
+        as: 'orders'
+      })
+      .unwind({
+        path: '$orders',
+        preserveNullAndEmptyArrays: true,
+      })
+      .unwind({
+        path: '$orders.productList',
+        preserveNullAndEmptyArrays: true,
+      })
+      .addFields({
+        originalPrice: {
+          $divide: [
+            {
+              $multiply: [
+                '$orders.productList.price',
+                { $subtract: [100, '$orders.productList.discount'] },
+              ],
+            },
+            100,
+          ],
+        },
+        amount: '$orders.productList.quantity',
+      })
+      .group({
+        _id: '$_id',
+        name: { $first: '$name' },
+        description: { $first: '$description' },
+        total: {
+          $sum: { $multiply: ['$originalPrice', '$amount'] },
+        },
+      })
+
+      let total = await Order.countDocuments();
 
       return res.send({
         code: 200,
@@ -1173,5 +1387,97 @@ module.exports = {
       return res.status(500).json({ code: 500, error: err });
     }
   },
-  
+
+
+  //-------------------------------------------------------------------------------------------------------------------------------------------//
+  questionTest: async (req, res, next) => {
+    try {
+
+      let results = await Employee.aggregate()
+      .lookup({
+        from: 'products',
+        localField: '_id',
+        foreignField: 'employeeId',
+        as: 'products'
+      })
+      .unwind({
+        path: '$products',
+        preserveNullAndEmptyArrays: true,
+      })
+      .lookup({
+        from: 'orders',
+        localField: '_id',
+        foreignField: '_id',
+        as: 'orders',
+      })
+      .unwind({
+        path: '$orders',
+        preserveNullAndEmptyArrays: true,
+      })
+      .unwind({
+        path: '$orders.productList',
+        preserveNullAndEmptyArrays: true,
+      })
+      // .unwind({
+      //   path: '$productList',
+      //   preserveNullAndEmptyArrays: true,
+      // })
+      // .addFields({
+      //   total: {
+      //     $sum: {
+      //       $divide: [
+      //         {
+      //           $multiply: [
+      //             '$productList.price',
+      //             { $subtract: [100, '$productList.discount'] },
+      //             '$productList.quantity',
+      //           ],
+      //         },
+      //         100,
+      //       ],
+      //     },
+      //   },
+      // })
+      // .lookup({
+      //   from: 'employees',
+      //   localField: 'employeeId',
+      //   foreignField: '_id',
+      //   as: 'employee',
+      // })
+      // // .unwind('employee')
+      // .unwind(
+      //   {
+      //     path: '$employee',
+      //     preserveNullAndEmptyArrays: true,
+      //   }
+      // )
+      // .group({
+      //   _id: '$employee._id',
+      //   firstName: { $first: '$employee.firstName' },
+      //   lastName: { $first: '$employee.lastName' },
+      //   email: { $first: '$employee.email' },
+      //   phoneNumber: { $first: '$employee.phoneNumber' },
+      //   address: { $first: '$employee.address' },
+      //   birthday: { $first: '$employee.birthday' },
+      //   password: { $first: '$employee.password' },
+      //   total: { $sum: '$total' },
+      // })
+      // .sort({
+      //   lastName: 1,
+      // });
+
+      let total = await Employee.countDocuments();
+
+      return res.send({
+        code: 200,
+        total,
+        totalResult: results.length,
+        payload: results,
+      });
+    } catch (err) {
+      console.log('««««« err »»»»»', err);
+      return res.status(500).json({ code: 500, error: err });
+    }
+
+  },
 };

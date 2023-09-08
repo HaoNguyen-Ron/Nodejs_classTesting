@@ -8,6 +8,7 @@ const {
 } = require('./validation');
 
 const {
+  questionTest,
   question1,
   question1a,
   question1b,
@@ -44,8 +45,10 @@ const {
   question26,
   // question26b,
   // question26c,
-  // question27,
-  // question30,
+  question27,
+  question28,
+  question29,
+  question30,
   // question34,
 } = require('./controller');
 
@@ -83,6 +86,12 @@ const {
 // router.get('/30', question30);
 // router.get('/34', question34);
 const routes = [
+  {
+    path: '/test',
+    method: 'get',
+    validators: [],
+    handlers: [questionTest],
+  },
   {
     path: '/1',
     method: 'get',
@@ -256,6 +265,30 @@ const routes = [
     method: 'get',
     validators: [],
     handlers: [question26],
+  },
+  {
+    path: '/27',
+    method: 'get',
+    validators: [],
+    handlers: [question27],
+  },
+  {
+    path: '/28',
+    method: 'get',
+    validators: [],
+    handlers: [question28],
+  },
+  {
+    path: '/29',
+    method: 'get',
+    validators: [],
+    handlers: [question29],
+  },
+  {
+    path: '/30',
+    method: 'get',
+    validators: [],
+    handlers: [question30],
   },
 ];
 
