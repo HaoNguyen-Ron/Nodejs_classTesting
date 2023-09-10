@@ -49,7 +49,10 @@ const {
   question28,
   question29,
   question30,
-  // question34,
+  question31,
+  question32,
+  question33,
+  question34,
 } = require('./controller');
 
 // router.get('/1', question1);
@@ -289,6 +292,30 @@ const routes = [
     method: 'get',
     validators: [],
     handlers: [question30],
+  },
+  {
+    path: '/31',
+    method: 'get',
+    validators: [],
+    handlers: [question31],
+  },
+  {
+    path: '/32',
+    method: 'get',
+    validators: [],
+    handlers: [question32],
+  },
+  {
+    path: '/33',
+    method: 'get',
+    validators: [],
+    handlers: [question33],
+  },
+  {
+    path: '/34',
+    method: 'get',
+    validators: [],
+    handlers: [question34],
   },
 ];
 
