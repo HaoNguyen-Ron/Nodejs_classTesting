@@ -33,6 +33,7 @@ const {
   question8c,
   // question13,
   // question15,
+  question16,
   question17,
   question18,
   question19,
@@ -208,6 +209,12 @@ const routes = [
     method: 'get',
     validators: [],
     handlers: [question8c],
+  },
+  {
+    path: '/16',
+    method: 'get',
+    validators: [],
+    handlers: [question16],
   },
   {
     path: '/17',

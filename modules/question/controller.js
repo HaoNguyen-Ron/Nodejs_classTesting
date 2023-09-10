@@ -232,6 +232,8 @@ module.exports = {
     }
   },
 
+
+  //-------------lean
   question3a: async (req, res, next) => {
     try {
       const s = { $subtract: [100, '$discount'] }; // (100 - 10) s => 90
@@ -280,7 +282,6 @@ module.exports = {
       return res.status(500).json({ code: 500, error: err });
     }
   },
-
 
   //-----------------aggregate
   question3d: async (req, res, next) => {
@@ -331,6 +332,7 @@ module.exports = {
       return res.status(500).json({ code: 500, error: err });
     }
   },
+
   //-----------------aggregate reverse (trong bảng này không có liên kết với bảng khác)
   question3e: async (req, res, next) => {
     try {
@@ -647,7 +649,34 @@ module.exports = {
     }
   },
 
-  //-------------------group
+  question16: async (req, res, next) => {
+    try {
+      let results = await Order.aggregate()
+      // .unwind('productList')
+      .lookup({
+        from: 'customers',
+        localField: 'customerId',
+        foreignField: '_id',
+        as: 'customer',
+      })
+      // .unwind('customer')
+  
+
+      let total = await Order.countDocuments();
+
+      return res.send({
+        code: 200,
+        total,
+        totalResult: results.length,
+        payload: results,
+      });
+    } catch (err) {
+      console.log('««««« err »»»»»', err);
+      return res.status(500).json({ code: 500, error: err });
+    }
+  },
+
+    //-------------------group
   question17: async (req, res, next) => {
     try {
 
