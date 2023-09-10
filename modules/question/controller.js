@@ -1656,31 +1656,31 @@ module.exports = {
   questionTest: async (req, res, next) => {
     try {
 
-      let results = await Employee.aggregate()
-        .lookup({
-          from: 'products',
-          localField: '_id',
-          foreignField: 'employeeId',
-          as: 'products'
-        })
-        .unwind({
-          path: '$products',
-          preserveNullAndEmptyArrays: true,
-        })
-        .lookup({
-          from: 'orders',
-          localField: '_id',
-          foreignField: '_id',
-          as: 'orders',
-        })
-        .unwind({
-          path: '$orders',
-          preserveNullAndEmptyArrays: true,
-        })
-        .unwind({
-          path: '$orders.productList',
-          preserveNullAndEmptyArrays: true,
-        })
+      // let results = await Employee.aggregate()
+      //   .lookup({
+      //     from: 'products',
+      //     localField: '_id',
+      //     foreignField: 'employeeId',
+      //     as: 'products'
+      //   })
+      //   .unwind({
+      //     path: '$products',
+      //     preserveNullAndEmptyArrays: true,
+      //   })
+      //   .lookup({
+      //     from: 'orders',
+      //     localField: '_id',
+      //     foreignField: '_id',
+      //     as: 'orders',
+      //   })
+      //   .unwind({
+      //     path: '$orders',
+      //     preserveNullAndEmptyArrays: true,
+      //   })
+      //   .unwind({
+      //     path: '$orders.productList',
+      //     preserveNullAndEmptyArrays: true,
+      //   })
       // .unwind({
       //   path: '$productList',
       //   preserveNullAndEmptyArrays: true,
@@ -1728,8 +1728,10 @@ module.exports = {
       // .sort({
       //   lastName: 1,
       // });
-
-      let total = await Employee.countDocuments();
+      
+      //-------------------------------
+      let results = await Order.find().populate('customers')
+      let total = await Order.countDocuments();
 
       return res.send({
         code: 200,
