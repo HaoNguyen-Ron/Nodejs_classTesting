@@ -15,10 +15,17 @@
 // app.use('/employees', employeesRouter);
 // app.use('/customers', customerRouter);
 // app.use('/orders', orderRouter);
+const passport = require('passport');
+
 
 const routes = [
     {
+        path: '/auth',
+        router: require('./modules/auth/router')
+    },
+    {
         path: '/products',
+        validator: passport.authenticate('jwt', { session: false }),
         router: require('./modules/product/router')
     },
     {
