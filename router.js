@@ -21,35 +21,42 @@ const passport = require('passport');
 const routes = [
     {
         path: '/auth',
+        validator: [],
         router: require('./modules/auth/router')
     },
     {
         path: '/products',
-        validator: passport.authenticate('jwt', { session: false }),
+        validator: [passport.authenticate('jwt', { session: false })],
         router: require('./modules/product/router')
     },
     {
         path: '/categories',
+        validator: [],
         router: require('./modules/category/router')
     },
     {
         path: '/suppliers',
+        validator: [],
         router: require('./modules/supplier/router')
     },
     {
         path: '/employees',
+        validator: [],
         router: require('./modules/employee/router')
     },
     {
         path: '/customers',
+        validator: [],
         router: require('./modules/customer/router')
     },
     {
         path: '/orders',
+        validator: [],
         router: require('./modules/order/router')
     },
     {
         path: '/questions',
+        validator: [],
         router: require('./modules/question/router')
     },
 ];
