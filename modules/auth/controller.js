@@ -28,11 +28,11 @@ module.exports = {
           birthday,
           updatedAt,
         });
-      // const refreshToken = generateRefreshToken(_id);
+      const refreshToken = generateRefreshToken(_id);
 
       return res.status(200).json({
         token,
-        // refreshToken,
+        refreshToken,
       });
     } catch (err) {
       console.log('««««« err »»»»»', err);
@@ -55,7 +55,7 @@ module.exports = {
           const customer = await Customer.findOne({
             _id: id,
             isDeleted: false,
-          }).select('-password').lean();
+          }).select('-password').lean(); // vì có refresh token tức đã login không cần check isValidPass
 
           if (customer) {
             const {
