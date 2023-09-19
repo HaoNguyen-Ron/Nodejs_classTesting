@@ -16,7 +16,8 @@ module.exports = {
         email,
         birthday,
         updatedAt,
-      } = req.user
+      } = req.user;
+      
       const token = generateToken({
           _id,
           firstName,

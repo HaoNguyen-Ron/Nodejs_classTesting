@@ -11,18 +11,18 @@ const generateToken = (user) => {
   // email,
   // birthday,
   // updatedAt,
+
+  // phần quan trọng
   const expiresIn = '24h';
   const algorithm = 'HS256'; 
 
   return JWT.sign(
     {
       iat: Math.floor(Date.now() / 1000),
-      // email: user.email,
-      // name: user.firstName,
       ...user,
-      // algorithm,
+      algorithm,
     },
-    jwtSettings.SECRET,
+    jwtSettings.SECRET, 
     {
       expiresIn,
     },
